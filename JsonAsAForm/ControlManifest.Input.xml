@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<manifest>
+  <control namespace="VinnyBComponents" constructor="JsonAsAForm" version="0.0.1" display-name-key="JsonAsAForm" description-key="JsonAsAForm description" control-type="standard">
+      <type-group name="text">
+        <type>SingleLine.Text</type>
+        <type>SingleLine.TextArea</type>
+        <type>Multiple</type>
+      </type-group>
+      <property name="attribute" display-name-key="JSON Schema" description-key="JSON Schema" of-type-group="text" usage="bound" required="true" />
+    <resources>
+      <code path="index.ts" order="1"/>
+      <css path="css/JsonAsAForm.css" order="1" />
+    </resources>
+  </control>
+</manifest>
