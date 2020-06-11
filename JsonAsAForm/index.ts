@@ -26,34 +26,17 @@ export class JsonAsAForm implements ComponentFramework.StandardControl<IInputs, 
 	public init(context: ComponentFramework.Context<IInputs>, notifyOutputChanged: () => void, state: ComponentFramework.Dictionary, container: HTMLDivElement) {
 		this._container = container;
 		this._container.id = "jsonasaform_container";
-		this.FormatJSON(context.parameters.attribute.raw!);
+		this._json = context.parameters.attribute.raw!;
 
 		ReactDOM.render(
 			React.createElement(JsonAsAFormTSX,
 				{
+					title: "",
 					json: this._json
 				}),
 			this._container);
 	}
-
-	public FormatJSON(json: string) {
-
-		try {
-			if (json) {
-				if (json.startsWith("[") && json.endsWith("]"))
-					this._json = "{\"\":" + json + "}";
-				else
-					this._json = json;
-			}
-			else
-				this._json = "{ \"\": \"\" }";
-		}
-		catch (e) {
-			this._json = "{ \"\": \"JSON Invalid\" }";
-		}
-	}
-
-
+	
 	/**
 	 * Called when any value in the property bag has changed. This includes field values, data-sets, global values such as container height and width, offline status, control metadata values such as label, visible, etc.
 	 * @param context The entire property bag available to control via Context Object; It contains values as set up by the customizer mapped to names defined in the manifest, as well as utility functions

@@ -1,6 +1,8 @@
 import React = require("react");
+import ReactDOM = require("react-dom");
 
 export interface IJsonAsAFormTSXProps {
+    title: string,
     json: string,
 }
 
@@ -17,53 +19,53 @@ export class JsonAsAFormTSX extends React.Component<IJsonAsAFormTSXProps, IJsonA
         this.items = new Array<any>();
 
         this.state = {
+            title: this.props.title,
             json: this.props.json,
             Items: this.items
         };
 
-        this.onLoad();
-    }
-
-    componentWillReceiveProps(props: IJsonAsAFormTSXProps) {
-
-        this.items = new Array<any>();
-
-        this.state = {
-            json: this.props.json,
-            Items: this.items
-        };
         this.onLoad();
     }
 
     render(): JSX.Element {
-        return <>
+        return <div className="jsonasaform_object">
+            <div className="jsonasaform_object_title">{this.state.title}</div>
             {this.state.Items}
-        </>;
+        </div>;
     }
 
     onLoad = () => {
-        let data = Object.assign({}, JSON.parse(this.state.json));
-        this.renderJson(data);
+        let data = this.formatJson(this.state.json);
+
+        try {
+            data = Object.assign({}, JSON.parse(data));
+        }
+        catch (e) {
+            data = JSON.parse("{ \"Invalid\": \"JSON\" }");
+        }
+        finally {
+            this.renderJson(data);
+        }
     }
 
     renderJson(data: any) {
 
         Object.keys(data).forEach(key_ => {
             let value: any = data[key_];
-            if (typeof (value) == "object") {
-                this.items.push(<div className="jsonasaform_object">{key_}</div>);
-
-                if (value instanceof Array)
-                    value.forEach(key2_ => {
-                        this.renderJson(key2_);
-                    });
+            if (typeof (value) == "object" && value instanceof Array) {
+                const title = key_;
+                value.forEach(item_ => {
+                    this.items.push(React.createElement(JsonAsAFormTSX,
+                        {
+                            title: title,
+                            json: JSON.stringify(item_)
+                        }));
+                });
             }
             else {
-
                 if (typeof value === "string" && value.indexOf("/Date(") > -1)
                     value = this.getDateFromAspNetFormat(value);
-
-                this.items.push(<div><label className="jsonasaform_attribute_label">{key_}</label><input className="jsonasaform_attribute_value" value={value} /></div>);
+                this.items.push(<div className="json_property"><label>{key_}</label><input value={value} /></div>);
             }
         });
 
@@ -71,6 +73,19 @@ export class JsonAsAFormTSX extends React.Component<IJsonAsAFormTSXProps, IJsonA
             {
                 Items: this.items
             });
+    }
+
+    public formatJson(json: string): string {
+
+        if (json) {
+            if (json.startsWith("[") && json.endsWith("]"))
+                return "{\"\":" + json + "}";
+            else
+                return json;
+        }
+        else
+            return "{ \"\": \"\" }";
+
     }
 
     public getDateFromAspNetFormat(date: string): string {
